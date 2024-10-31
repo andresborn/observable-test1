@@ -1,49 +1,120 @@
 ---
-title: Rosling test
+title: Análisis centro y periferia
 toc: false
 ---
 
-# The health and wealth of nations
-Live demo from an episode of [Fun Fun Function](https://fff.dev). Source code and explanation [here](https://github.com/funfunfunction/fff-health-and-wealth-of-nations).
+# Análisis de ingresos y manufactura entre el centro y la periferia
+
+TODO: Make a nice graph from this https://thetricontinental.org/dossier-how-latin-america-can-delink-from-imperialism/
+
+
 ```js
-const manufacturingAndIncome = FileAttachment("./data/out.csv").csv({typed: true});
+const regions = FileAttachment("./data/regions.csv").csv({typed: true});
+const corePeriphery = FileAttachment("./data/core_periphery.csv").csv({typed: true});
+
 ```
 
 ```js
-const rangeYears = d3.sort(d3.union(manufacturingAndIncome.map((d) => d.year, 10)))
+const rangeYears = d3.sort(d3.union(regions.map((d) => d.year, 10)))
 ```
 
 ```js
-const yearIndex = view(
-  Inputs.range(
-    [0, rangeYears.length-1],
-    {step: 1,  format: (x) => rangeYears[x], }
+// const yearIndex = view(
+//   Inputs.range(
+//     [0, rangeYears.length-1],
+//     {step: 1,  format: (x) => rangeYears[x], }
     
-  )
-);
+//   )
+// );
 ```
 
 ```js
-const year = rangeYears[yearIndex]
+// const year = rangeYears[yearIndex]
 ```
 
+```js
+const lastDefined = {
+  reduceIndex(I, X) {
+    for (let i = I.length - 1; i >= 0; --i) {
+      const x = X[I[i]];
+      if (x != null) {
+        return x;
+      }
+    }
+  }
+}
+```
+
+### Diferencia de ingresos per cápita entre el centro y la periferia
 ```js
 Plot.plot({
-  grid: true,
-  aspectRatio: undefined,
-  height: 600,
-  width: 900,
-  color: {legend: true, type: "categorical", scheme: "accent"},
-  x: {domain: [new Date('1950'), new Date('2030')], value: "year", transform: (y) => new Date(String(y))},
-  y: {type: "log", domain: [200, 100e3]},
+  marginBottom: 100,
+  marginLeft: 100,
+  fx: {padding: 0, label: null, tickRotate: 90, tickSize: 6},
+  x: {axis: null, paddingOuter: 0.2},
+  y: {grid: true},
+  color: {legend: true},
   marks: [
-    Plot.dot(manufacturingAndIncome, {x: "year", y: "income", stroke: "name"}),
-    Plot.dot(manufacturingAndIncome, {x: "year", y: "manufacturing_per_capita", stroke: "name"})
+    Plot.barY(corePeriphery, {y:"income", x: "system", fx: "year", fill: "system"}),
+    Plot.ruleY([0])
   ]
 })
 ```
 
-### Dataset
+### Diferencia de ingresos per cápita entre regiones
 ```js
-manufacturingAndIncome
+Plot.plot({
+  marginBottom: 100,
+  marginLeft: 100,
+  fx: {padding: 0, label: null, tickRotate: 90, tickSize: 6},
+  x: {axis: null, paddingOuter: 0.2},
+  y: {grid: true},
+  color: {legend: true},
+  marks: [
+    Plot.barY(regions, {y:"income", x: "name", fx: "year", fill: "name"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+### Diferencia de valor agregado de manufactura per cápita entre el centro y la periferia
+```js
+Plot.plot({
+  marginBottom: 100,
+  marginLeft: 100,
+  fx: {padding: 0, label: null, tickRotate: 90, tickSize: 6},
+  x: {axis: null, paddingOuter: 0.2},
+  y: {grid: true},
+  color: {legend: true},
+  marks: [
+    Plot.barY(corePeriphery, {y:"manufacturing_per_capita", x: "system", fx: "year", fill: "system"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+### Producción de valor agregado de manufactura entre el centro y la periferia
+```js
+Plot.plot({
+  marginBottom: 100,
+  marginLeft: 150,
+  fx: {padding: 0, label: null, tickRotate: 90, tickSize: 6},
+  x: {axis: null, paddingOuter: 0.2},
+  y: {grid: true},
+  color: {legend: true},
+  marks: [
+    Plot.barY(corePeriphery, {y:"manufacturing", x: "system", fx: "year", fill: "system"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+### Core/Periphery Dataset
+```js
+corePeriphery
+```
+
+### Regions Dataset
+```js
+regions
 ```
